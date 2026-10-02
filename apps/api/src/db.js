@@ -1,9 +1,14 @@
 import pg from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 import { config } from './config.js';
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+
+const embeddedPath = process.env.EMBEDDED_DB_PATH || '.local/postgres';
+if (config.embedded && embeddedPath !== 'memory://') mkdirSync(dirname(embeddedPath), { recursive: true });
 
 const database = config.embedded
-  ? new PGlite(process.env.EMBEDDED_DB_PATH || '.local/postgres')
+  ? new PGlite(embeddedPath)
   : new pg.Pool({
       connectionString: process.env.DATABASE_URL,
       max: 8,
