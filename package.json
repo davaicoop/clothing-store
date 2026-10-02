@@ -1,0 +1,35 @@
+{
+  "name": "clothing-store",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "vite --config apps/web/vite.config.js --host 0.0.0.0",
+    "dev:api": "node --env-file=.env --watch apps/api/src/server.js",
+    "build": "vite build --config apps/web/vite.config.js",
+    "start": "node apps/api/src/server.js",
+    "db:migrate": "node --env-file=.env apps/api/scripts/migrate.js",
+    "db:seed": "node --env-file=.env apps/api/scripts/seed.js",
+    "test": "node --test tests/commerce.test.js",
+    "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.3.16",
+    "bcryptjs": "3.0.3",
+    "cookie-parser": "1.4.7",
+    "express": "5.2.1",
+    "express-rate-limit": "8.7.0",
+    "helmet": "8.3.0",
+    "lucide-react": "0.544.0",
+    "pg": "8.23.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-router-dom": "7.18.4",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "5.2.0",
+    "vite": "7.3.6"
+  }
+}
