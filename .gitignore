@@ -1,0 +1,9 @@
+node_modules/
+apps/web/dist/
+.env
+.env.*
+!.env.example
+.local/
+test-results/
+*.log
+*.zip
