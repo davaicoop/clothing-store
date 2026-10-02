@@ -6,6 +6,7 @@ The sample catalog and editorial sections use externally hosted Unsplash photogr
 | --- | --- |
 | White cotton clothing, Mediamodifier | https://unsplash.com/photos/elbKS4DY21g |
 | Clothing assortment, Md Salman | https://unsplash.com/photos/tWOz2_EK5EQ |
+| Black hoodie, Tobias van Schneider | https://unsplash.com/photos/black-hoodie-7k73_NUaXDg |
 | Jacket, Tobias Tullius | https://unsplash.com/photos/Fg15LdqpWrs |
 | Sneakers, Irene Kredenets | https://unsplash.com/photos/dwKiHoqqxk8 |
 | Denim portrait, Bailey Mahon | https://unsplash.com/photos/JVIW21HuHe8 |

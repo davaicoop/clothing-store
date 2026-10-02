@@ -7,7 +7,7 @@ import { config } from '../src/config.js';
 const photo=(id,w=900)=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=85`;
 export const collection=[
   {name:'The Everyday Tee',category:'T-Shirts',audience:'Unisex',price:1400,cost:650,image:photo('photo-1620799139507-2a76f79a2f4d'),colors:['White','Black'],sizes:['S','M','L','XL'],featured:true},
-  {name:'Essential Cotton Hoodie',category:'Hoodies',audience:'Unisex',price:3200,cost:1650,image:photo('photo-1562157873-818bc0726f68'),colors:['Black','White'],sizes:['S','M','L','XL'],featured:true},
+  {name:'Essential Cotton Hoodie',category:'Hoodies',audience:'Unisex',price:3200,cost:1650,image:photo('photo-1499972777470-6a932ea55420'),colors:['Black','White'],sizes:['S','M','L','XL'],featured:true},
   {name:'The Weekend Jacket',category:'Shirts',audience:'Men',price:4800,cost:2400,image:photo('photo-1591047139829-d91aecb6caea'),colors:['Olive','Black'],sizes:['M','L','XL'],featured:true},
   {name:'City Low-Top Sneakers',category:'Shoes',audience:'Unisex',price:4500,cost:2600,image:photo('photo-1560769629-975ec94e6a86'),colors:['White','Blue'],sizes:['38','39','40','41','42'],featured:true},
   {name:'Sunset Denim Jacket',category:'Shirts',audience:'Women',price:4200,cost:2200,image:photo('photo-1654468087954-b6da0c45f9a8'),colors:['Blue'],sizes:['S','M','L'],featured:true},

@@ -2,6 +2,8 @@
 
 A working mobile-first clothing retail MVP: editorial storefront, variant-aware shopping bag, guest checkout, order tracking and a separate protected shop workspace. The default sample shop name is **FORME**; change it in **Admin → Settings**.
 
+Live store: https://clothing-store-axbn.onrender.com/. Current hosting details and verification are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## Implemented
 
 - Home, new arrivals, best sellers, Men/Women/Shoes/Accessories collections and featured pieces.
@@ -52,6 +54,7 @@ docs/
   ROADMAP.md
   OPERATIONS.md
   IMAGE_SOURCES.md
+  DEPLOYMENT.md
 tests/commerce.test.js   Focused API integration coverage
 scripts/check.mjs
 render.yaml
