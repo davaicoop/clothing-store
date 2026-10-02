@@ -91,7 +91,9 @@ export async function placeOrder(body, requestKey) {
     assert(existing.request_hash===requestHash,409,'Use a new checkout attempt for changed details.');
     result={id:existing.id,replayed:true};
   }
-  return {order:await getOrder(result.id),token:accessToken(result.id),replayed:result.replayed};
+  const order=await getOrder(result.id);
+  order.payments=order.payments.map(({note,...payment})=>payment);
+  return {order,token:accessToken(result.id),replayed:result.replayed};
 }
 export async function updateOrderStatus(id,status,adminId) {
   await transaction(async client=>{

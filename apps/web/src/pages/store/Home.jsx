@@ -11,7 +11,7 @@ export default function Home() {
     {name:'Women',caption:'Your everyday, reimagined.',photo:image('photo-1654468087954-b6da0c45f9a8',700)},
     {name:'Men',caption:'A better kind of essential.',photo:image('photo-1652184513381-9755426e7fd2',700)},
     {name:'Shoes',caption:'Find your next favourite pair.',photo:image('photo-1560769629-975ec94e6a86',700)},
-    {name:'Accessories',caption:'The finishing touch.',photo:image('photo-1591047139829-d91aecb6caea',700)},
+    {name:'Accessories',caption:'The finishing touch.',photo:image('photo-1663573690125-d326a87a2535',700)},
   ];
   const best=[...products].sort((a,b)=>b.popularity-a.popularity).slice(0,4);
   return <>

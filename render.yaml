@@ -1,0 +1,44 @@
+# One Node web service serves both the React storefront and Express API.
+# Use the existing clothing-store resources if already deployed; do not apply
+# this as a second stack after direct MCP deployment.
+services:
+  - type: web
+    name: clothing-store
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.20.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clothing-store-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: "false"
+      - key: USE_EMBEDDED_DB
+        value: "false"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: AUTO_MIGRATE
+        value: "true"
+      - key: SEED_CATALOG
+        value: "true"
+      - key: SEED_DEMO_ORDERS
+        value: "false"
+databases:
+  - name: clothing-store-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "18"

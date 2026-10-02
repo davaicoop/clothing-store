@@ -16,6 +16,8 @@ export const collection=[
   {name:'The Layering Tee',category:'T-Shirts',audience:'Women',price:1200,cost:550,image:photo('photo-1620799139507-2a76f79a2f4d'),colors:['White','Cream'],sizes:['S','M','L'],featured:false},
   {name:'Heavyweight Cotton Tee',category:'T-Shirts',audience:'Men',price:1800,cost:800,image:photo('photo-1562157873-818bc0726f68'),colors:['Navy','Black'],sizes:['M','L','XL'],featured:false},
   {name:'Everyday Canvas Trainers',category:'Shoes',audience:'Unisex',price:3500,cost:1800,image:photo('photo-1560769629-975ec94e6a86'),colors:['White','Blue'],sizes:['37','38','39','40'],featured:false},
+  {name:'Straight-Leg Everyday Denim',category:'Trousers',audience:'Unisex',price:2900,cost:1400,image:photo('photo-1714729382668-7bc3bb261662'),colors:['Blue'],sizes:['28','30','32','34','36'],featured:false},
+  {name:'The Everyday Canvas Tote',category:'Accessories',audience:'Unisex',price:950,cost:400,image:photo('photo-1663573690125-d326a87a2535'),colors:['Cream','Black'],sizes:['One Size'],featured:false},
 ];
 export async function seed() {
   if(config.adminEmail && config.adminPassword) {

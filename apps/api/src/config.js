@@ -7,13 +7,14 @@ if (production && process.env.USE_EMBEDDED_DB === 'true') {
   throw new Error('Production requires managed PostgreSQL through DATABASE_URL.');
 }
 if (production && !process.env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
-if (production && !process.env.APP_ORIGIN) throw new Error('APP_ORIGIN is required in production.');
+if (production && !process.env.APP_ORIGIN && !process.env.RENDER_EXTERNAL_URL) throw new Error('APP_ORIGIN is required in production.');
+if (production && process.env.ADMIN_PASSWORD && process.env.ADMIN_PASSWORD.length < 12) throw new Error('Production ADMIN_PASSWORD must contain at least 12 characters.');
 
 export const config = {
   production,
   port: Number(process.env.PORT || 5000),
   secret,
-  origin: process.env.APP_ORIGIN || 'http://localhost:5173',
+  origin: process.env.APP_ORIGIN || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
   embedded: process.env.USE_EMBEDDED_DB === 'true',
   adminEmail: process.env.ADMIN_EMAIL || (!production ? 'admin@clothing.local' : ''),
   adminPassword: process.env.ADMIN_PASSWORD || (!production ? 'ChangeMe!2026' : ''),
