@@ -1,4 +1,5 @@
 import { query } from '../db.js';
+import { config } from '../config.js';
 
 export async function getProducts({ includeArchived = false, client } = {}) {
   const run = client ? client.query.bind(client) : query;
@@ -21,5 +22,6 @@ export async function getSettings(client) {
   const s=rows[0];
   return { shopName:s.shop_name,phone:s.phone,whatsapp:s.whatsapp,email:s.email,location:s.location,
     deliveryFee:Number(s.delivery_fee),currency:s.currency,currencySymbol:s.currency_symbol,
-    lowStockThreshold:s.low_stock_threshold,mpesaInstructions:s.mpesa_instructions };
+    lowStockThreshold:s.low_stock_threshold,mpesaInstructions:s.mpesa_instructions,
+    demoMode:!config.production && process.env.SEED_DEMO_ORDERS==='true' };
 }

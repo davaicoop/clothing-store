@@ -1,0 +1,21 @@
+import { Link } from 'react-router-dom';
+import { Check,MessageCircle,Package,RefreshCw } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
+import { formatDate,whatsappLink } from '../lib/api';
+import { Badge,ProductImage } from './UI';
+
+export default function OrderView({order,placed=false,onRefresh,admin=false}) {
+  const {money,settings}=useStore();
+  const steps=order.fulfilment==='Pickup'?['New','Confirmed','Preparing','Ready','Delivered']:['New','Confirmed','Preparing','Ready','Out for Delivery','Delivered'];
+  const stepIndex=steps.indexOf(order.status);
+  const whatsapp=whatsappLink(settings.whatsapp,`Hello ${settings.shopName}, I'd like to ask about order ${order.orderNumber}.`);
+  return <div className="order-view">{placed&&<div className="order-success"><span className="success-icon"><Check size={26}/></span><span className="eyebrow">YOUR NEW FAVOURITES ARE ON THEIR WAY</span><h1>You're on the list.</h1><p>Your order has been received. The shop will contact you to confirm it.</p></div>}
+    <div className="order-title"><div><span className="eyebrow">{formatDate(order.createdAt,true)}</span><h2>{order.orderNumber}</h2></div><div><Badge>{order.status}</Badge>{onRefresh&&<button className="icon-button" aria-label="Refresh order status" onClick={onRefresh}><RefreshCw size={18}/></button>}</div></div>
+    {order.status!=='Cancelled'?<ol className="order-progress">{steps.map((s,i)=><li key={s} className={i<=stepIndex?'complete':''}><span>{i<stepIndex?<Check size={13}/>:i+1}</span><div>{s==='Delivered'&&order.fulfilment==='Pickup'?'Collected':s}</div></li>)}</ol>:<div className="info-banner">This order was cancelled. Contact the shop if you need help.</div>}
+    <div className="order-detail-grid"><div><section className="order-panel"><h3>Your pieces</h3>{order.items.map(i=><div className="order-line-item" key={i.id}><ProductImage src={i.image} alt={i.name}/><div><Link to={`/products/${i.productId}`}><strong>{i.name}</strong></Link><span>{i.size} / {i.color} · Qty {i.quantity}</span></div><strong>{money(i.unitPrice*i.quantity)}</strong></div>)}<div className="summary-line"><span>Subtotal</span><span>{money(order.subtotal)}</span></div><div className="summary-line"><span>Delivery</span><span>{money(order.deliveryFee)}</span></div><div className="summary-line summary-total"><span>Total</span><strong>{money(order.total)}</strong></div></section>
+      <section className="order-panel"><h3>Order updates</h3><div className="event-list">{order.events.map((event,i)=><div key={i}><span/><div><strong>{event.message}</strong><small>{formatDate(event.createdAt,true)}</small></div></div>)}</div></section></div>
+      <div><section className="order-panel"><h3><Package size={19}/> {order.fulfilment==='Pickup'?'Shop pickup':'Delivery details'}</h3><strong>{order.customer.name}</strong><p>+{order.customer.phone}</p>{order.fulfilment==='Delivery'?<p>{order.address}<br/>{order.town}</p>:<p>{settings.location}</p>}{order.instructions&&<p className="muted">{order.instructions}</p>}</section>
+        <section className="order-panel payment-panel"><h3>Payment <Badge>{order.paymentStatus}</Badge></h3><strong>{order.paymentMethod} · {money(order.total)}</strong>{order.paymentStatus==='Pending'&&<p>{order.paymentMethod==='M-Pesa'?(settings.mpesaInstructions||'Contact the shop for their M-Pesa payment details. Use your order number as the reference. Your payment will be confirmed after verification.'):order.paymentMethod==='Pay on Pickup'?'Pay at the shop when you collect your order.':'Pay when your order is delivered.'}</p>}{order.paymentStatus==='Paid'&&<p>Your payment has been recorded by the shop.</p>}{order.paymentStatus==='Refunded'&&<p>The shop has recorded a refund for this order.</p>}{order.paymentMethod==='M-Pesa'&&order.paymentStatus==='Pending'&&<small>No automatic M-Pesa prompt has been sent.</small>}</section>
+        {!admin&&whatsapp&&<a className="button button-outline full-width" href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={19}/> Ask about this order</a>}{!admin&&<p className="small-note">Keep your order number. You can track it with the phone number used at checkout.</p>}</div></div>
+  </div>;
+}
