@@ -6,7 +6,10 @@ export const phone = z.string().trim().transform(value => {
   const digits = value.replace(/[\s()+-]/g, '');
   return /^0[17]\d{8}$/.test(digits) ? `254${digits.slice(1)}` : digits;
 }).pipe(z.string().regex(/^\d{9,15}$/, 'Enter a valid phone number including country code.'));
-export const url = z.string().url().refine(value => /^https?:\/\//.test(value), 'Use an HTTP or HTTPS image URL.');
+export const url = z.union([
+  z.string().url().refine(value => /^https?:\/\//.test(value), 'Use an HTTP or HTTPS image URL.'),
+  z.string().regex(/^\/products\/[a-zA-Z0-9_-]+\.(?:png|jpe?g|webp|avif)$/,'Use a bundled product photo or an HTTP or HTTPS image URL.'),
+]);
 export const variantSchema = z.object({
   id: uuid.optional(), size: text(30), color: text(40), sku: text(80),
   stock: z.coerce.number().int().min(0).max(1000000),
@@ -18,12 +21,12 @@ export const productSchema = z.object({
   price: z.coerce.number().positive().max(10000000).transform(n => Math.round(n * 100) / 100),
   costPrice: z.coerce.number().nonnegative().max(10000000).nullable().optional(),
   images: z.array(url).min(1).max(12), active: z.boolean().default(true),
-  featured: z.boolean().default(false), variants: z.array(variantSchema).min(1).max(100),
+  featured: z.boolean().default(false), showcase: z.boolean().default(false), variants: z.array(variantSchema).min(1).max(100),
 }).superRefine((value, ctx) => {
   const combinations = value.variants.map(v => `${v.size.toLowerCase()}/${v.color.toLowerCase()}`);
   const skus = value.variants.map(v => v.sku.toLowerCase());
   if (new Set(combinations).size !== combinations.length || new Set(skus).size !== skus.length) {
-    ctx.addIssue({ code: 'custom', path: ['variants'], message: 'Each size/color and SKU must be unique.' });
+    ctx.addIssue({ code: 'custom', path: ['variants'], message: 'Each storage or option/colour combination and SKU must be unique.' });
   }
 });
 export const checkoutSchema = z.object({

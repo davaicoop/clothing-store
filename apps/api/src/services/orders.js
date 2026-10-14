@@ -46,7 +46,7 @@ export async function placeOrder(body, requestKey) {
         return {id:existing.id,replayed:true};
       }
       const settings=await getSettings(client);
-      const variants=(await client.query(`SELECT v.*,p.name,p.price,p.images,c.name AS category
+      const variants=(await client.query(`SELECT v.*,p.name,p.price,p.images,p.showcase,c.name AS category
         FROM product_variants v JOIN products p ON p.id=v.product_id JOIN categories c ON c.id=p.category_id
         WHERE v.id=ANY($1::uuid[]) AND v.active=true AND p.active=true ORDER BY v.id FOR UPDATE OF v`,
         [data.items.map(i=>i.variantId)])).rows;
@@ -54,6 +54,7 @@ export async function placeOrder(body, requestKey) {
       let subtotalCents=0;
       for (const line of data.items) {
         const v=variants.find(v=>v.id===line.variantId);
+        assert(!v.showcase,409,`${v.name} is a preview listing. Contact Sam Store to confirm its price and availability.`);
         assert(v.stock>=line.quantity,409,`${v.name} (${v.color} / ${v.size}) has ${v.stock} available. Please update your bag.`);
         subtotalCents+=cents(v.price)*line.quantity;
       }
@@ -62,7 +63,7 @@ export async function placeOrder(body, requestKey) {
         [data.customer.name,data.customer.phone,data.customer.email||null])).rows[0];
       const id=randomUUID();
       const deliveryCents=data.fulfilment==='Delivery' ? cents(settings.deliveryFee) : 0;
-      const orderNumber=`CS-${new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Nairobi'}).replaceAll('-','')}-${randomBytes(4).toString('hex').toUpperCase()}`;
+      const orderNumber=`SAM-${new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Nairobi'}).replaceAll('-','')}-${randomBytes(4).toString('hex').toUpperCase()}`;
       await client.query(`INSERT INTO orders(id,order_number,customer_id,customer_name,customer_phone,customer_email,
         subtotal,delivery_fee,total,currency,payment_method,fulfilment,town,address,instructions,request_key,request_hash,lookup_hash)
         VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,

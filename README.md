@@ -1,172 +1,57 @@
-# Clothing Store
+# Sam Store
 
-A working mobile-first clothing retail MVP: editorial storefront, variant-aware shopping bag, guest checkout, order tracking and a separate protected shop workspace. The default sample shop name is **FORME**; change it in **Admin → Settings**.
+An iPhone and Apple products storefront with a separate protected admin workspace. The existing clothing shop has been converted in place, using Sam Store's supplied black-and-gold logo.
 
-Live store: https://clothing-store-axbn.onrender.com/. Current hosting details and verification are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Live store: https://clothing-store-axbn.onrender.com/
 
-## Implemented
+Admin: https://clothing-store-axbn.onrender.com/admin/login
 
-- Home, new arrivals, best sellers, Men/Women/Shoes/Accessories collections and featured pieces.
-- Search; category, price, size, colour and availability filters; newest, price and popularity sorting.
-- Product photography, stock per size/colour, quantity selection and related pieces.
-- Local persistent cart, variant changes, delivery fees and pickup totals.
-- Guest delivery/pickup checkout, private tracking links and order-number/phone lookup.
-- M-Pesa **manual verification**, cash on delivery and pay on pickup. No fake STK prompt or fabricated real payment success.
-- Secure admin sessions, hashed passwords, login throttling, protected API/routes and password changes.
-- Product creation/editing/archiving, editable categories, variants and image URLs.
-- Atomic stock reservations, stock adjustments/history, cancellation restocking and order/payment history.
-- Customer records, paid-sales dashboard, sales charts, category/product/payment analytics.
-- Configurable shop/contact/location/delivery/M-Pesa instructions; ordinary WhatsApp and phone links.
+## Storefront
 
-## Architecture
+- iPhone, MacBook, iPad, Apple Watch, AirPods and accessories.
+- Mobile navigation, product search, category/colour/storage/availability filters and sorting.
+- Model reference photography, product descriptions and configurable storage or other device options.
+- Variant-aware shopping bag, guest delivery or pickup checkout and private order tracking.
+- M-Pesa manual verification, cash on delivery and pay on pickup.
+- WhatsApp enquiries and phone/email links when configured by the owner.
 
-React + Vite + React Router + Lucide render the storefront and admin workspace. Express exposes `/api`. PostgreSQL stores all business data. A single Node service serves the compiled frontend **and** the API, avoiding duplicate frontend/API services and cross-origin cookie configuration. It still has separate frontend and backend source directories.
+## Complete the shop setup
 
-Prices, delivery fees and stock are checked on the server. Checkout locks selected variants inside one transaction, records stock movements and uses an idempotency key to prevent duplicate orders. Product prices/names/category/variants are snapshotted on order items. Products and variants are archived so old orders remain valid. Cancellation releases the reservation once. Product edits reject stale stock snapshots. Sessions use randomly generated, hashed tokens in HttpOnly, SameSite=Strict cookies; production cookies are Secure.
+The 12 starter Apple listings are **catalogue previews**. Public pages show **Price on enquiry**. Opening stock is zero. Preview products cannot be ordered, even if stock is subsequently added. The setup prices in admin are illustrative values, not confirmed sale prices.
 
-## Folder structure
+1. Sign in with the existing admin account. Credentials were preserved.
+2. Open **Settings** and add the verified phone, WhatsApp number, email, location, delivery fee and M-Pesa instructions.
+3. Open **Products**, choose a listing and replace its setup price with the actual selling price. Confirm the description, device condition, exact RAM/storage/connectivity configuration and package contents. Use photographs of the actual stock where appropriate.
+4. Set stock for each storage/colour or other configuration. For a different price, create a separate listing; the current price is per product, shared by its variants.
+5. Clear **Preview listing (enquiries only)** and save to enable checkout.
 
-```text
-apps/
-  api/
-    migrations/          Versioned PostgreSQL schema
-    scripts/             Migration and seed entrypoints
-    src/
-      lib/               Validation and HTTP errors
-      middleware/        Authentication and mutation protection
-      routes/            Store, authentication and modular admin APIs
-      services/          Catalog and transactional order logic
-      app.js             Express middleware and routes
-      config.js          Validated runtime configuration
-      db.js              PostgreSQL pool / local embedded PostgreSQL
-      server.js          Startup and graceful shutdown
-  web/
-    public/
-    src/
-      components/        Reusable storefront/admin controls
-      context/           Live catalog, settings and persistent cart
-      hooks/
-      lib/
-      pages/store/
-      pages/admin/
-      styles/            Base, storefront and administration CSS
-docs/
-  ROADMAP.md
-  OPERATIONS.md
-  IMAGE_SOURCES.md
-  DEPLOYMENT.md
-tests/commerce.test.js   Focused API integration coverage
-scripts/check.mjs
-render.yaml
-```
+The variant field named `size` in the existing database/API is retained for compatibility; it now holds storage, watch case size or another configuration. Storefront and admin labels reflect the device options. Refer to the description for device condition and exact specifications.
 
-## Local setup
+## Data conversion
 
-Install **Node.js 22 or later**, then:
+Migration `003_sam_store.sql` changes the store name, adds preview/seed state and archives the former clothing catalogue once. It retains products, variants, stock quantities, customers, sessions, credentials, order snapshots, payments and inventory history. The Apple catalogue is seeded once. Restarts and later deploys do not reset the owner's prices, availability or stock.
+
+The original React + Vite + React Router + Lucide frontend, Express API and PostgreSQL architecture is preserved. One Render Node web service serves the frontend and `/api`. The existing Render service and database are reused; the public hostname remains unchanged.
+
+## Development
+
+Node.js 22+ is required.
 
 ```bash
-git clone https://github.com/davaicoop/clothing-store.git
-cd clothing-store
-git switch feature/clothing-store-mvp
 npm ci --include=dev
-```
-
-Copy `.env.example` to `.env` (`cp .env.example .env` on macOS/Linux, `Copy-Item .env.example .env` in PowerShell).
-
-### Fast local PostgreSQL option
-
-The example environment enables **PGlite**, actual PostgreSQL running locally in-process with data persisted at `.local/postgres`. This makes the MVP usable locally without a native database installation. It is exclusively a development/test option; production rejects it.
-
-```bash
+cp .env.example .env
 npm run db:migrate
 npm run db:seed
 npm run dev:api
 ```
 
-In a second terminal:
+In another terminal, run `npm run dev`. Frontend: http://localhost:5173. Backend: http://localhost:5000/api/health.
 
-```bash
-npm run dev
-```
+The example environment uses PGlite, real PostgreSQL running in-process for local development. Production requires managed PostgreSQL via `DATABASE_URL` and rejects embedded mode. Keep `.env` and credentials out of git.
 
-Frontend: `http://localhost:5173`. Backend: `http://localhost:5000/api/health`. Use only one API process against the same embedded data directory.
+Local development admin: `admin@clothing.local` / `ChangeMe!2026`. These are development credentials only. Live credentials remain unchanged. Existing passwords are never reset by seed configuration.
 
-### Native PostgreSQL
-
-Create a dedicated database with PostgreSQL 14+:
-
-```sql
-CREATE DATABASE clothing_store;
-```
-
-Set `USE_EMBEDDED_DB=false` and `DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/clothing_store` in `.env`. Set `DATABASE_SSL=false` for a local database, run the migration/seed commands above and start both applications. PostgreSQL UUID generation is built in; an additional extension is unnecessary.
-
-### Development administrator
-
-- URL: `http://localhost:5173/admin/login`
-- Email: `admin@clothing.local`
-- Password: `ChangeMe!2026`
-
-These are **development credentials only**. Production requires a distinct admin password and a random session secret. Seed creates the admin only if that email does not already exist; changing the environment variable later does not reset an existing password. Change a password in **Admin → Settings**.
-
-## Environment variables
-
-| Variable | Purpose |
-| --- | --- |
-| `NODE_ENV` | `development`, `test`, or `production` |
-| `PORT` | Express port; default 5000, automatically supplied by Render |
-| `DATABASE_URL` | Dedicated PostgreSQL connection string; required in production |
-| `DATABASE_SSL` | `true` for external TLS connections; `false` on Render's private network |
-| `USE_EMBEDDED_DB` | Development/test only; production must use `false` |
-| `EMBEDDED_DB_PATH` | Local PostgreSQL storage path; `memory://` for isolated tests |
-| `SESSION_SECRET` | At least 32 random characters; protects private order links |
-| `ADMIN_EMAIL` | Admin email to create on first startup |
-| `ADMIN_PASSWORD` | Initial admin password, stored as a bcrypt hash |
-| `AUTO_MIGRATE` | Apply versioned migrations at startup; default true |
-| `SEED_CATALOG` | Seed sample products only into an empty catalog |
-| `SEED_DEMO_ORDERS` | Local example orders only; ignored in production |
-| `APP_ORIGIN` | Exact frontend origin for mutation verification |
-| `RENDER_EXTERNAL_URL` | Render-provided fallback for the canonical origin |
-
-Never commit `.env` or production credentials. The storefront keeps its cart and up to 30 private order links on the customer's device. Order links should be treated as private. Lookup needs the random order number and checkout phone; lookup and checkout are throttled.
-
-## Database
-
-Tables: `admins`, `admin_sessions`, `products`, `product_variants`, `categories`, `customers`, `orders`, `order_items`, `payments`, `inventory_movements`, `order_events`, `business_settings`, `schema_migrations`.
-
-Seed data contains 12 sample clothing/accessory products, sizes, colours, unique SKUs and initial inventory. Photography is illustrative and can be replaced through product image URLs. Sample customer orders/payment records are seeded **only** when `SEED_DEMO_ORDERS=true` outside production; the admin displays a development banner. Live revenue starts at zero.
-
-## Orders and accounting
-
-Delivery: `New → Confirmed → Preparing → Ready → Out for Delivery → Delivered`.
-
-Pickup: `New → Confirmed → Preparing → Ready → Delivered` (shown as Collected on customer tracking).
-
-Orders can be cancelled before dispatch. A paid order requires a full refund to be recorded before cancellation. Cancellation restores reserved stock once; a refund alone does not restore stock. Mark an order delivered/collected after recording the verified payment. Payment lifecycle: `Pending → Paid → Refunded`.
-
-Sales revenue is the total of paid, non-cancelled orders, including delivery. Full refunds are excluded from the original order date's revenue. Category/product revenue excludes delivery. Average order value uses paid orders. Popularity on the storefront counts quantities in non-cancelled orders. Business dates use `Africa/Nairobi`. Manual payment records are an audit of what the shop verified, not automatic confirmation from a payment provider.
-
-## Deployment on Render
-
-`render.yaml` describes exactly **one free web service** and **one free PostgreSQL instance** in Frankfurt. The same web URL serves storefront and `/api`. Do not deploy a second stack if these clothing-store resources already exist.
-
-For a new deployment, open:
-
-`https://dashboard.render.com/blueprint/new?repo=https://github.com/davaicoop/clothing-store`
-
-Select DAVAI, deploy `main`, set `ADMIN_EMAIL` and a unique `ADMIN_PASSWORD`. The Blueprint generates `SESSION_SECRET` and wires the internal database URL. `RENDER_EXTERNAL_URL` supplies the frontend origin; set `APP_ORIGIN` to the custom domain if you add one later.
-
-For direct creation or updating an existing clothing-store service:
-
-- Build: `npm ci --include=dev && npm run build`
-- Start: `npm start`
-- Health: `/api/health`
-- Environment: `NODE_ENV=production`, `USE_EMBEDDED_DB=false`, `DATABASE_SSL=false`, `SEED_DEMO_ORDERS=false`, dedicated `DATABASE_URL`, random `SESSION_SECRET`, initial admin email/password.
-- Keep the app and database in the same region/workspace and use the internal database URL.
-- Express serves React Router fallback routes, including direct product/admin/tracking links.
-- Migrations and safe initial catalog/admin seeds run at startup. They never overwrite existing products, stock or passwords.
-
-Render's free PostgreSQL instances expire after 30 days and do not include managed backups. Plan a supported database upgrade and exports before taking real customer orders. Free web services may sleep when idle. See `docs/OPERATIONS.md` for first-launch tasks.
+`SEED_DEMO_ORDERS=true` explicitly enables example orders and stocked listings outside production. It is ignored in production; public production starter listings are previews.
 
 ## Verification
 
@@ -176,16 +61,17 @@ npm test
 npm run build
 ```
 
-Six focused PostgreSQL-backed HTTP integration tests cover protected admin sessions, guest checkout and authoritative totals, retries, concurrent stock reservations, private order access, M-Pesa manual verification, refunds/cancellation, pickup completion, product editing/archiving, stale-stock protection, inventory history, reports, settings and categories. Each run uses a new in-memory PostgreSQL database and never touches production data. Browser visual/mobile checks are separate from these API tests.
+The PostgreSQL-backed HTTP integration suite covers authentication, authoritative checkout totals, retries, concurrent stock reservations, refunds/cancellations, pickup fulfilment, product editing, inventory history, reports and settings. Conversion coverage tests legacy order/contact preservation, preview checkout protection, owned product-photo URLs, admin verification and repeated migration/seed execution. Tests use independent in-memory databases and never modify production data.
 
-## Future M-Pesa / Daraja integration
+## Deployment
 
-The current order/payment schema and `services/orders.js` provide the integration boundary: place the order with Pending payment, create an external payment intent, and append a verified payment record only after independently validating the provider result.
+The existing Render service deploys `main` automatically:
 
-Add an M-Pesa provider module with Daraja OAuth/token handling, STK Push initiation, callback persistence, idempotent reconciliation and status-query verification. Add `payment_intents` with provider IDs and unique transaction references, then a separate provider callback route with provider-specific request verification. Do not route callbacks through admin sessions or trust a client-reported successful payment. Handle duplicate callbacks, wrong amounts/order IDs, timeouts and expired stock reservations.
+- Build: `npm ci --include=dev && npm run build`
+- Start: `npm start`
+- Health: `/api/health`
+- Migrations and one-time Apple catalogue seed run at startup.
 
-Credentials required later: Safaricom Daraja app consumer key/secret, business shortcode, passkey, environment and public callback URL. M-Pesa till/paybill instructions for **manual** payment can be configured now in Settings without API credentials. Card, SMS, notifications and storage integrations belong to later roadmap phases.
+`render.yaml` retains the existing service/database names so that applying a Blueprint does not introduce a second shop stack. Use a feature branch, verify, integrate through `develop`, and promote to `main` without force-pushing.
 
-## Git workflow
-
-`feature/clothing-store-mvp` contains initial development. Test changes there, promote to `develop`, then fast-forward or cleanly merge the verified integration into `main`. `main` is the live branch. Never force-push. GitHub Actions repeats syntax, focused API tests and the frontend production build.
+See [image sources](docs/IMAGE_SOURCES.md) and [operations](docs/OPERATIONS.md). Product photography and specifications are model references; Sam Store is an independent retailer.

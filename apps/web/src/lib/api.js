@@ -18,4 +18,4 @@ export function whatsappLink(phone,message) {
   return `https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(message)}`;
 }
 export const formatDate=(value,includeTime=false)=>value?new Intl.DateTimeFormat('en-KE',{timeZone:'Africa/Nairobi',day:'numeric',month:'short',year:'numeric',...(includeTime?{hour:'2-digit',minute:'2-digit'}:{})}).format(new Date(value)):'—';
-export const colorValue=color=>({Black:'#252525',White:'#fff',Blue:'#7496b8',Navy:'#29374e',Olive:'#7c846a',Cream:'#eee8da',Rose:'#c8929e',Grey:'#b0b0b0'}[color]||'#9e8c7a');
+export const colorValue=color=>({Black:'#252525',White:'#fff',Blue:'#7496b8',Navy:'#29374e',Olive:'#7c846a',Cream:'#eee8da',Rose:'#c8929e',Grey:'#b0b0b0','Desert Titanium':'#c6ac90','Natural Titanium':'#a7a299','Black Titanium':'#343333',Ultramarine:'#687bb3',Teal:'#729393',Pink:'#e9c4cc',Midnight:'#303641',Starlight:'#f0e8d7','Space Grey':'#77797d','Jet Black':'#1d1d1d',Silver:'#d9dade','Rose Gold':'#cba39c',Purple:'#b9afcf'}[color]||'#9e8c7a');

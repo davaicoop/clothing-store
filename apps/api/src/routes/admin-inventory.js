@@ -6,8 +6,8 @@ import { assert } from '../lib/errors.js';
 
 export const inventoryRouter=Router();
 inventoryRouter.get('/inventory',async(_req,res)=>{
-  const {rows}=await query(`SELECT v.id,p.name,p.images,v.product_id AS "productId",v.size,v.color,v.sku,v.stock,v.active,
-    (v.stock<=s.low_stock_threshold) AS "lowStock" FROM product_variants v JOIN products p ON p.id=v.product_id
+  const {rows}=await query(`SELECT v.id,p.name,p.images,p.showcase,v.product_id AS "productId",v.size,v.color,v.sku,v.stock,v.active,
+    (p.showcase=false AND v.stock<=s.low_stock_threshold) AS "lowStock" FROM product_variants v JOIN products p ON p.id=v.product_id
     CROSS JOIN business_settings s WHERE p.active=true AND v.active=true ORDER BY v.stock,p.name,v.color,v.size`);
   res.json(rows);
 });

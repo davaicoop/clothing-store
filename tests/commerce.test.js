@@ -20,6 +20,9 @@ async function request(path,method='GET',body,extra={}) {
 const checkout=(variantId,quantity=1,phone='0712345678')=>({customer:{name:'Test Shopper',phone,email:'shopper@example.com'},fulfilment:'Delivery',town:'Nairobi',address:'Westlands test address',instructions:'Call on arrival',paymentMethod:'M-Pesa',items:[{variantId,quantity}]});
 before(async()=>{
   await migrate();await seed();
+  // Verified inventory fixture: starter listings stay as previews until the owner confirms them.
+  await query('UPDATE products SET showcase=false');
+  await query('UPDATE product_variants SET stock=12');
   server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));
   base=`http://127.0.0.1:${server.address().port}`;
   products=(await request('/products')).data;

@@ -14,12 +14,12 @@ async function saveProduct(body,id,adminId) {
     let productId=id;
     if(id) {
       assert((await client.query('SELECT id FROM products WHERE id=$1 FOR UPDATE',[id])).rows[0],404,'Product not found.');
-      await client.query(`UPDATE products SET name=$1,description=$2,category_id=$3,audience=$4,price=$5,cost_price=$6,images=$7,active=$8,featured=$9 WHERE id=$10`,
-        [p.name,p.description,p.categoryId,p.audience,p.price,p.costPrice??null,JSON.stringify(p.images),p.active,p.featured,id]);
+      await client.query(`UPDATE products SET name=$1,description=$2,category_id=$3,audience=$4,price=$5,cost_price=$6,images=$7,active=$8,featured=$9,showcase=$10 WHERE id=$11`,
+        [p.name,p.description,p.categoryId,p.audience,p.price,p.costPrice??null,JSON.stringify(p.images),p.active,p.featured,p.showcase,id]);
     } else {
-      productId=(await client.query(`INSERT INTO products(name,description,category_id,audience,price,cost_price,images,active,featured)
-        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
-        [p.name,p.description,p.categoryId,p.audience,p.price,p.costPrice??null,JSON.stringify(p.images),p.active,p.featured])).rows[0].id;
+      productId=(await client.query(`INSERT INTO products(name,description,category_id,audience,price,cost_price,images,active,featured,showcase)
+        VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`,
+        [p.name,p.description,p.categoryId,p.audience,p.price,p.costPrice??null,JSON.stringify(p.images),p.active,p.featured,p.showcase])).rows[0].id;
     }
     const old=(await client.query('SELECT * FROM product_variants WHERE product_id=$1 ORDER BY id FOR UPDATE',[productId])).rows;
     // Preserve referenced variants so existing order history remains valid.

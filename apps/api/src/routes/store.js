@@ -10,7 +10,10 @@ import { phone,uuid,text } from '../lib/validation.js';
 
 export const storeRouter=Router();
 storeRouter.get('/settings',async (_req,res)=>res.json(await getSettings()));
-storeRouter.get('/categories',async (_req,res)=>res.json((await query('SELECT id,name,slug FROM categories ORDER BY name')).rows));
+storeRouter.get('/categories',async (_req,res)=>res.json((await query(`SELECT c.id,c.name,c.slug FROM categories c
+  WHERE c.name NOT IN ('Men','Women','T-Shirts','Shirts','Hoodies','Trousers','Dresses','Shoes')
+    OR EXISTS (SELECT 1 FROM products p WHERE p.category_id=c.id AND p.active=true)
+  ORDER BY c.name`)).rows));
 storeRouter.get('/products',async (_req,res)=>res.json(await getProducts()));
 storeRouter.get('/products/:id',async(req,res)=>{
   uuid.parse(req.params.id);

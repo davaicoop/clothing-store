@@ -24,6 +24,7 @@ import { Empty } from './components/UI';
 import './styles/base.css';
 import './styles/store.css';
 import './styles/admin.css';
+import './styles/sam-store.css';
 
 class ErrorBoundary extends React.Component {
   state={failed:false};
@@ -37,7 +38,7 @@ function App() {
       <Route index element={<Home/>}/><Route path="shop" element={<Catalogue/>}/><Route path="products/:id" element={<Product/>}/>
       <Route path="cart" element={<Cart/>}/><Route path="checkout" element={<Checkout/>}/><Route path="orders" element={<Orders/>}/>
       <Route path="orders/:id" element={<OrderTracking/>}/><Route path="contact" element={<Contact/>}/>
-      <Route path="*" element={<Empty title="A little off the runway." description="This page doesn't exist. Let's get you back to the collection."/>}/>
+      <Route path="*" element={<Empty title="This page is out of reach." description="This page doesn't exist. Let's get you back to Sam Store."/>}/>
     </Route>
     <Route path="admin/login" element={<Login/>}/><Route path="admin" element={<AdminLayout/>}>
       <Route index element={<Dashboard/>}/><Route path="products" element={<Products/>}/><Route path="products/new" element={<ProductEditor/>}/>

@@ -5,7 +5,7 @@ const StoreContext=createContext(null);
 export function StoreProvider({children}) {
   const [products,setProducts]=useState([]);
   const [categories,setCategories]=useState([]);
-  const [settings,setSettings]=useState({shopName:'FORME',currency:'KES',currencySymbol:'KSh',deliveryFee:300});
+  const [settings,setSettings]=useState({shopName:'Sam Store',currency:'KES',currencySymbol:'KSh',deliveryFee:300});
   const [loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState('');
   const [cart,setCart]=useState(()=>{
     const saved=readStorage('clothing-cart-v1',[]);
@@ -19,18 +19,19 @@ export function StoreProvider({children}) {
   }
   useEffect(()=>{refresh();const focus=()=>refresh();window.addEventListener('focus',focus);return()=>window.removeEventListener('focus',focus);},[]);
   useEffect(()=>{writeStorage('clothing-cart-v1',cart);},[cart]);
-  useEffect(()=>{document.title=`${settings.shopName} · Everyday, elevated`;},[settings.shopName]);
+  useEffect(()=>{document.title=`${settings.shopName} · iPhone & Apple Products`;},[settings.shopName]);
   useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),3500);return()=>clearTimeout(timer);},[notice]);
   const money=amount=>`${settings.currencySymbol} ${Number(amount||0).toLocaleString('en-KE',{maximumFractionDigits:2})}`;
   const items=useMemo(()=>cart.map(line=>{
     const product=products.find(p=>p.id===line.productId);
     const variant=product?.variants.find(v=>v.id===line.variantId);
     return {...line,product,variant,price:product?.price||0,stock:variant?.stock||0,
-      available:!!variant && variant.stock>=line.quantity};
+      available:!!variant && !product.showcase && variant.stock>=line.quantity};
   }),[products,cart]);
   const subtotal=items.reduce((sum,line)=>sum+line.price*line.quantity,0);
   const count=cart.reduce((sum,line)=>sum+line.quantity,0);
   function addToCart(product,variant,quantity=1) {
+    if(product.showcase){setNotice('Ask Sam Store to confirm this product before ordering.');return false;}
     const current=cart.find(i=>i.variantId===variant.id)?.quantity||0;
     if(current+quantity>variant.stock || current+quantity>99){setNotice('There is not enough stock for that quantity.');return false;}
     setCart(previous=>{
@@ -49,7 +50,7 @@ export function StoreProvider({children}) {
     const line=cart.find(i=>i.variantId===oldId),product=products.find(p=>p.id===line?.productId),v=product?.variants.find(v=>v.id===newId);
     if(!v || oldId===newId)return;
     const other=cart.find(i=>i.variantId===newId);
-    if(line.quantity+(other?.quantity||0)>Math.min(99,v.stock)){setNotice('Not enough stock in that size and colour.');return;}
+    if(line.quantity+(other?.quantity||0)>Math.min(99,v.stock)){setNotice('Not enough stock in that option and colour.');return;}
     setCart(previous=>{
       const rest=previous.filter(i=>i.variantId!==oldId);
       if(other)return rest.map(i=>i.variantId===newId?{...i,quantity:i.quantity+line.quantity}:i);

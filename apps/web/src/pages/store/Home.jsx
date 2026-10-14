@@ -1,27 +1,54 @@
-import { Link } from 'react-router-dom';
-import { Truck,Store,Smartphone,MoveUpRight } from 'lucide-react';
-import { useStore } from '../../context/StoreContext';
+import {Link} from 'react-router-dom';
+import {ArrowUpRight,ArrowRight,Smartphone,Laptop,Tablet,Watch,Headphones,Cable,Truck,Store,MessageCircle} from 'lucide-react';
+import {useStore} from '../../context/StoreContext';
+import {whatsappLink} from '../../lib/api';
 import ProductCard from '../../components/ProductCard';
-import { ProductImage } from '../../components/UI';
+import {ProductImage} from '../../components/UI';
 
-const image=(id,w=1600)=>`https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=85`;
+const ranges=[
+  {name:'iPhone',caption:'Find your iPhone',Icon:Smartphone},
+  {name:'MacBook',caption:'Work. Create. Go.',Icon:Laptop},
+  {name:'iPad',caption:'Room for your ideas',Icon:Tablet},
+  {name:'Apple Watch',caption:'On your wrist',Icon:Watch},
+  {name:'AirPods',caption:'Your everyday sound',Icon:Headphones},
+  {name:'Accessories',caption:'The little essentials',Icon:Cable},
+];
+const faqs=[
+  ['How do I choose the right iPhone?','Start with the model, then choose your storage and colour. Ask us to confirm the condition, battery health where relevant, SIM configuration and package contents for the exact device.'],
+  ['Why do some products say “Price on enquiry”?','These are catalogue previews. Sam Store will confirm the selling price and available stock before the listing is opened for checkout.'],
+  ['Can I pay with M-Pesa?','Available products can be ordered with M-Pesa. The store verifies your payment and updates your order status. Cash on delivery and pay on pickup are also available for their respective order types.'],
+  ['How does delivery or pickup work?','Choose delivery or shop pickup at checkout. Enter your location for delivery. For pickup, wait for the store to confirm that your order is ready. You can follow updates on the order tracking page.'],
+];
 export default function Home() {
-  const {products}=useStore();
-  const categories=[
-    {name:'Women',caption:'Your everyday, reimagined.',photo:image('photo-1654468087954-b6da0c45f9a8',700)},
-    {name:'Men',caption:'A better kind of essential.',photo:image('photo-1591047139829-d91aecb6caea',700)},
-    {name:'Shoes',caption:'Find your next favourite pair.',photo:image('photo-1560769629-975ec94e6a86',700)},
-    {name:'Accessories',caption:'The finishing touch.',photo:image('photo-1663573690125-d326a87a2535',700)},
-  ];
-  const best=[...products].sort((a,b)=>b.popularity-a.popularity).slice(0,4);
+  const {products,settings}=useStore();
+  const featured=products.filter(p=>p.featured).slice(0,4);
+  const phones=products.filter(p=>p.category==='iPhone').slice(2,6);
+  const chat=whatsappLink(settings.whatsapp,`Hello Sam Store, I'd like help choosing an Apple device.`);
   return <>
-    <section className="fashion-hero"><div className="hero-copy"><span className="eyebrow"><span/>THE EVERYDAY EDIT / 01</span><h1>Good style.<br/>Your way<span>.</span></h1><p>Easy essentials. Fresh finds.<br/>A wardrobe that feels like you.</p><div className="hero-buttons"><Link className="button" to="/shop">Explore the collection</Link><Link className="text-link" to="/shop?sort=newest">Discover new arrivals</Link></div><div className="hero-index"><span>LESS EFFORT. MORE YOU.</span><span>01 — 03</span></div></div>
-      <div className="hero-image"><ProductImage src={image('photo-1652184513381-9755426e7fd2')} alt="Fashion portrait from the everyday collection" fetchPriority="high"/><div className="hero-image-label"><span>OFF-DUTY.<br/>ON POINT.</span><Link to="/shop?category=Women">Shop the look <MoveUpRight size={21}/></Link></div><div className="image-corner">THE NEW ROTATION</div></div></section>
-    <div className="benefit-strip"><span><Truck size={21}/> Delivery across Kenya</span><span><Smartphone size={21}/> M-Pesa & cash options</span><span><Store size={21}/> Easy shop pickup</span></div>
-    <section className="collection-section page-container"><div className="section-heading"><div><span className="eyebrow">JUST LANDED</span><h2>New in. All you.</h2></div><Link className="text-link" to="/shop?sort=newest">Shop new arrivals</Link></div><div className="product-grid">{products.slice(0,4).map((p,i)=><ProductCard key={p.id} product={p} index={i}/>)}</div></section>
-    <section className="category-section page-container"><div className="section-heading"><div><span className="eyebrow">FIND YOUR ROTATION</span><h2>Go your own way.</h2></div><Link className="text-link" to="/shop">Shop all</Link></div><div className="category-grid">{categories.map(c=><Link className="category-tile" to={`/shop?category=${c.name}`} key={c.name}><ProductImage src={c.photo} alt={`${c.name} collection`} loading="lazy"/><div><h3>{c.name}</h3><span>{c.caption}</span></div><MoveUpRight className="category-icon" size={25}/></Link>)}</div></section>
-    <section className="editorial-banner"><div className="editorial-image"><ProductImage src={image('photo-1654468087954-b6da0c45f9a8',1200)} alt="Denim layers worn in warm evening light" loading="lazy"/></div><div className="editorial-copy"><span className="eyebrow">THE WEEKEND UNIFORM</span><h2>Wear it.<br/>Live in it.<br/>Repeat.</h2><p>The pieces you reach for again and again.<br/>Discover easy layers for whatever comes next.</p><Link className="button button-white" to="/shop?category=Shirts">Find your layers</Link><span className="editorial-note">EVERYDAY, ELEVATED.</span></div></section>
-    <section className="collection-section page-container"><div className="section-heading"><div><span className="eyebrow">IN GOOD COMPANY</span><h2>The most-loved edit.</h2></div><Link className="text-link" to="/shop?sort=popular">Shop best sellers</Link></div><div className="product-grid">{best.map((p,i)=><ProductCard key={p.id} product={p} index={i}/>)}</div></section>
-    <section className="closing-band"><span>LOOK GOOD. FEEL LIKE YOU.</span><h2>Your next favourite<br/>is waiting.</h2><Link className="button" to="/shop">Shop the collection</Link></section>
+    <section className="sam-hero">
+      <div className="sam-hero-copy"><span className="eyebrow gold-eyebrow"><span className="gold-dot"/> SAM STORE / SINCE 2026</span>
+        <h1>Your next<br/><span>iPhone.</span><br/>Right here.</h1>
+        <p>Discover iPhone, Mac, iPad and the Apple essentials that fit your day.</p>
+        <div className="sam-hero-buttons"><Link className="button" to="/shop?category=iPhone">Explore iPhones <ArrowRight size={18}/></Link><Link className="sam-quiet-link" to="/shop">Shop all products <ArrowUpRight size={17}/></Link></div>
+        <div className="sam-hero-foot"><span>YOUR MODEL. YOUR COLOUR. YOUR STORAGE.</span><span>01 / THE IPHONE COLLECTION</span></div>
+      </div>
+      <div className="sam-hero-visual"><span className="sam-visual-label">A CLOSER LOOK AT PRO</span><ProductImage src="/products/iphone-pro-hero.jpg" alt="iPhone 16 Pro in Desert Titanium, shown from the front and back" fetchPriority="high" width="600" height="600"/>
+        <Link className="sam-hero-product" to="/shop?category=iPhone"><div><span>iPhone 16 Pro</span><small>Titanium design. A18 Pro chip.</small></div><ArrowUpRight size={25}/></Link>
+      </div>
+    </section>
+    <div className="sam-service-strip"><span><Smartphone size={19}/> Apple products, your way</span><span><Truck size={19}/> Delivery & shop pickup</span><span><MessageCircle size={19}/> Help choosing your device</span></div>
+    <section className="sam-range-section page-container"><div className="sam-section-heading"><div><span className="eyebrow">EXPLORE SAM STORE</span><h2>All your favourites. One store.</h2></div><Link className="text-link" to="/shop">View all <ArrowUpRight size={17}/></Link></div>
+      <div className="sam-range-grid">{ranges.map(({name,caption,Icon})=><Link className="sam-range" key={name} to={`/shop?category=${encodeURIComponent(name)}`}><Icon size={30} strokeWidth={1.35}/><strong>{name}</strong><span>{caption}</span><ArrowUpRight className="sam-range-arrow" size={15}/></Link>)}</div>
+    </section>
+    <section className="sam-products-section page-container"><div className="sam-section-heading"><div><span className="eyebrow">THE SAM STORE SELECTION</span><h2>Find your next upgrade.</h2></div><Link className="text-link" to="/shop">Explore the catalogue <ArrowUpRight size={17}/></Link></div>
+      {products.some(p=>p.showcase)&&<p className="sam-preview-note"><span/> Preview listings show the range. Confirm price and availability with Sam Store.</p>}
+      <div className="product-grid">{featured.map((p,i)=><ProductCard product={p} index={i} key={p.id}/>)}</div>
+    </section>
+    <section className="sam-bento page-container"><Link to="/shop?category=MacBook" className="sam-feature-tile sam-mac-tile"><div><span className="eyebrow">MACBOOK</span><h2>A little less weight.<br/>A lot more possibility.</h2><p>Meet your next work and study companion.</p><span className="text-link">Explore MacBook <ArrowUpRight size={17}/></span></div><ProductImage src="/products/macbook-air.png" alt="MacBook Air with M3 chip" loading="lazy"/></Link>
+      <Link to="/shop?category=AirPods" className="sam-feature-tile sam-audio-tile"><div><span className="eyebrow">AIRPODS</span><h2>Put your day<br/>on play.</h2><span className="text-link">Explore AirPods <ArrowUpRight size={17}/></span></div><ProductImage src="/products/airpods.png" alt="AirPods Pro 2 with charging case" loading="lazy"/></Link>
+    </section>
+    <section className="sam-products-section page-container"><div className="sam-section-heading"><div><span className="eyebrow">PICK YOUR IPHONE</span><h2>Which one feels like you?</h2></div><Link className="text-link" to="/shop?category=iPhone">All iPhones <ArrowUpRight size={17}/></Link></div><div className="product-grid">{phones.map((p,i)=><ProductCard product={p} index={i} key={p.id}/>)}</div></section>
+    <section className="sam-help-section page-container"><div><span className="eyebrow">BEFORE YOU CHOOSE</span><h2>A few things<br/>you might ask.</h2><p>Choose your device with the details that matter to you.</p><Link className="text-link" to="/contact">Talk to Sam Store <ArrowUpRight size={17}/></Link></div><div className="sam-faqs">{faqs.map(([q,a])=><details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></section>
+    <section className="sam-closing"><div><span className="eyebrow">FROM SAM STORE, WITH CARE</span><h2>Your Apple world<br/>starts here.</h2><p>Find a device for the way you live, work and create.</p><div className="button-row"><Link className="button" to="/shop">Browse products <ArrowRight size={18}/></Link>{chat?<a className="button button-outline" href={chat} target="_blank" rel="noreferrer"><MessageCircle size={18}/> Ask Sam Store</a>:<Link className="button button-outline" to="/contact">Contact the store <ArrowUpRight size={18}/></Link>}</div></div><div className="sam-closing-signature"><Store size={34} strokeWidth={1}/><span>SAM STORE</span><small>SINCE 2026</small></div></section>
   </>;
 }

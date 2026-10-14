@@ -13,7 +13,7 @@ export async function getProducts({ includeArchived = false, client } = {}) {
   return rows.map(p => ({
     id:p.id, name:p.name, description:p.description, category:p.category, categoryId:p.category_id,
     audience:p.audience, price:Number(p.price), ...(includeArchived ? { costPrice:p.cost_price === null ? null : Number(p.cost_price) } : {}),
-    images:p.images, active:p.active, featured:p.featured, createdAt:p.created_at, popularity:p.popularity,
+    images:p.images, active:p.active, featured:p.featured, showcase:p.showcase, createdAt:p.created_at, popularity:p.popularity,
     variants:variants.filter(v=>v.product_id===p.id).map(v=>({ id:v.id,size:v.size,color:v.color,sku:v.sku,stock:v.stock,active:v.active })),
   }));
 }

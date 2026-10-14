@@ -10,7 +10,7 @@ export default function Checkout() {
   const [form,setForm]=useState({name:'',phone:'',email:'',town:'',address:'',instructions:'',fulfilment:params.get('fulfilment')==='Pickup'?'Pickup':'Delivery',paymentMethod:'M-Pesa'});
   const [busy,setBusy]=useState(false),[error,setError]=useState('');
   const update=(key,value)=>setForm(prev=>({...prev,[key]:value}));
-  if(!items.length)return <Empty title="Add something you love first." description="Your collection is just a few taps away."/>;
+  if(!items.length)return <Empty title="Add something you love first." description="Explore Apple products and add an available device to your bag."/>;
   const delivery=form.fulfilment==='Delivery'?settings.deliveryFee:0,valid=items.every(i=>i.available);
   function changeFulfilment(value){setForm(prev=>({...prev,fulfilment:value,paymentMethod:prev.paymentMethod==='M-Pesa'?'M-Pesa':value==='Delivery'?'Cash on Delivery':'Pay on Pickup'}));}
   async function submit(e) {

@@ -14,7 +14,7 @@ reportsRouter.get('/dashboard',async(_req,res)=>{
     COUNT(*) FILTER(WHERE ${tz}=(now() AT TIME ZONE 'Africa/Nairobi')::date)::int AS "ordersToday",
     COUNT(*) FILTER(WHERE status NOT IN ('Delivered','Cancelled'))::int AS "pendingOrders" FROM orders`);
   const lowStock=(await query(`SELECT v.id,p.name,v.size,v.color,v.stock FROM product_variants v JOIN products p ON p.id=v.product_id
-    CROSS JOIN business_settings s WHERE v.active=true AND p.active=true AND v.stock<=s.low_stock_threshold ORDER BY stock,p.name LIMIT 12`)).rows;
+    CROSS JOIN business_settings s WHERE v.active=true AND p.active=true AND p.showcase=false AND v.stock<=s.low_stock_threshold ORDER BY stock,p.name LIMIT 12`)).rows;
   const products=(await query('SELECT COUNT(*)::int AS count FROM products WHERE active=true')).rows[0].count;
   const recent=(await query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 6')).rows.map(orderSummary);
   res.json({...row,salesToday:Number(row.salesToday),salesMonth:Number(row.salesMonth),totalProducts:products,lowStock,recentOrders:recent});
